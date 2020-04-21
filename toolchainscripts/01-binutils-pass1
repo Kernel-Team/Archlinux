@@ -31,7 +31,7 @@ tar xf $SRC/$tarballname -C $TMP
 	
 	../configure --prefix=/tools            \
 				 --with-sysroot=$LFS        \
-				 --with-lib-path=/tools/lib:/tools/lib32 \
+				 --with-lib-path=/tools/lib \
 				 --target=$LFS_TGT          \
 				 --disable-nls              \
 				 --disable-werror
@@ -39,7 +39,6 @@ tar xf $SRC/$tarballname -C $TMP
 	case $(uname -m) in
 		x86_64) mkdir -v /tools/lib && ln -sv lib /tools/lib64 ;;
 	esac
-	mkdir -v /tools/lib32
 	make install
 	
 	}

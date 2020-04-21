@@ -4,16 +4,15 @@ JOBS=$(nproc)
 export MAKEFLAGS="-j${JOBS}"
 export LFS="/mnt/lfs"
 export LFS_TGT=$(uname -m)-lfs-linux-gnu
-export LFS_TGT32=i686-lfs-linux-gnu
 
 PATH=/tools/bin:/bin:/usr/bin
 
-export LC_ALL=C
+export LC_ALL=C PATH
 
 fetch() {
 	
 	tarballname=$(echo $1 | rev | cut -d / -f 1 | rev)
-	WGETCMD="wget --passive-ftp --tries=3 --waitretry=3 --output-document=$2/$tarballname.partial"
+	WGETCMD="wget --no-check-certificate --passive-ftp --tries=3 --waitretry=3 --output-document=$2/$tarballname.partial"
 	WGETRESUME="-c"
 	
 	if [ -f $2/$tarballname ]; then

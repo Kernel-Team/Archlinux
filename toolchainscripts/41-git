@@ -9,10 +9,11 @@ TMP=${TMP:-/tmp/build}
 LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
 
-NAME=linux
-VERSION=${LINUX_VER}
+NAME=git
+VERSION=${GIT_VER}
 
-fetch "https://mirrors.tuna.tsinghua.edu.cn/kernel/v4.x/linux-$LINUX_VER.tar.xz" $SRC
+fetch "https://mirrors.edge.kernel.org/pub/software/scm/git/git-$VERSION.tar.xz" $SRC
+#wget -c  https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.9.5.tar.gz --no-check-certificate -P  $SRC
 
 [ "$1" = "fetch" ] && exit 0
 
@@ -24,15 +25,16 @@ tar xf $SRC/$tarballname -C $TMP
 { time \
    {
 
-	cd $TMP/$NAME-$VERSION
+        cd $TMP/$NAME-$VERSION
 
-	make mrproper
-	make headers
-	cp -rv usr/include/* /tools/include
-	
-	}
+        ./configure --prefix=/tools
+        make
+        make install
+
+        }
 } 2>&1 | tee $LOG/$filename.log
     
 [ $PIPESTATUS = 0 ] && echo "$NAME-$VERSION" > /tools/$filename || exit $PIPESTATUS
 
 rm -fr $TMP
+
