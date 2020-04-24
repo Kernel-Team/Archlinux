@@ -1,0 +1,40 @@
+#!/bin/bash -e
+
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+
+name=man-pages
+version=${MAN_PAGES_VER}
+
+fetch "https://www.kernel.org/pub/linux/docs/$name/$name-$version.tar.xz" $SRC
+
+[ "$1" = "fetch" ] && exit 0
+
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+
+tar xf $SRC/$tarballname -C $TMP
+
+{ time \
+   {
+	cd $TMP/$name-$version
+	make DESTDIR=$PKG install
+
+	# ship with tzdata
+	rm $PKG/usr/share/man/man5/tzfile.5 \
+	   $PKG/usr/share/man/man8/zic.8 \
+	   $PKG/usr/share/man/man8/tzselect.8 \
+	   $PKG/usr/share/man/man8/zdump.8
+
+	}
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$NAME-$VERSION" >> /usr/scrip_$name || exit $PIPESTATUS
+
+rm -fr $TMP
