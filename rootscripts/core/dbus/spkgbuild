@@ -1,19 +1,36 @@
-# description	: Message bus system, a simple way for applications to talk to one another
-# depends	: expat libx11 libsm libice
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=dbus
 version=1.12.16
-release=3
-source="https://dbus.freedesktop.org/releases/$name/$name-$version.tar.gz
-	run"
+ 
+fetch "https://dbus.freedesktop.org/releases/$name/$name-$version.tar.gz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
-build() {
-	cd $name-$version
-
-	./configure \
+	./configure --prefix=/usr                          \
 		--prefix=/usr \
 		--sysconfdir=/etc \
-		--libexecdir=/usr/lib/$name \
 		--localstatedir=/var \
 		--disable-doxygen-docs \
 		--disable-xml-docs \
@@ -21,26 +38,14 @@ build() {
 		--with-console-auth-dir=/run/console \
 		--with-system-pid-file=/run/dbus/pid \
 		--with-system-socket=/run/dbus/system_bus_socket
-	make
-	make DESTDIR=$PKG install
 
-	chown -v root:messagebus $PKG/usr/lib/$name/dbus-daemon-launch-helper
-	chmod -v      4750       $PKG/usr/lib/$name/dbus-daemon-launch-helper
+        make
+	make install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
 
-	install -d $PKG/etc/dbus-1
-	cat > $PKG/etc/dbus-1/session-local.conf << "EOF"
-<!DOCTYPE busconfig PUBLIC
- "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
- "https://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
-<busconfig>
+rm -fr $TMP	
+	
 
-  <!-- Search for .service files in /usr/local -->
-  <servicedir>/usr/local/share/dbus-1/services</servicedir>
-
-</busconfig>
-EOF
-
-	# runit service
-        install -Dm755 $SRC/run $PKG/etc/sv/$name/run
-        ln -s /run/runit/supervise.$name $PKG/etc/sv/$name/supervise
-}

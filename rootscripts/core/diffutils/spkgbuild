@@ -1,19 +1,43 @@
-# description	: Programs that show the differences between files or directories
-# homepage	: https://www.gnu.org/software/diffutils
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-# depends	: bash
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=diffutils
 version=3.7
-release=1
-source="https://ftp.gnu.org/gnu/$name/$name-$version.tar.xz"
+ 
+fetch "https://ftp.gnu.org/gnu/$name/$name-$version.tar.xz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
-build() {
-	cd $name-$version
+	./configure --prefix=/usr                          \
+		    --disable-nls
 
-	./configure --prefix=/usr --disable-nls
-	make
-	make DESTDIR=$PKG install
+        make
+	make install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
 
-	rm -r $PKG/usr/share/info/
-}
+rm -fr $TMP	
+	
+

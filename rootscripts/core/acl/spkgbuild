@@ -1,28 +1,48 @@
-# description	: Utilities to administer Access Control Lists, which are used to define more fine-grained discretionary access rights for files and directories
-# homepage	: http://savannah.nongnu.org/projects/acl
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-# depends	: attr
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=acl
 version=2.2.53
-release=1
-source="https://download.savannah.gnu.org/releases/$name/$name-$version.tar.gz"
+ 
+fetch " https://download.savannah.gnu.org/releases/$name/$name-$version.tar.gz " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
-build() {
-	cd $name-$version
 	./configure --prefix=/usr    \
 	            --bindir=/bin    \
 	            --disable-static \
 		    --disable-nls    \
 	            --libexecdir=/usr/lib
 	make
-	make DESTDIR=$PKG install
+	make install
 
-	chmod -v 755 $PKG/usr/lib/libacl.so
+	#mv -v $PKG/usr/lib/libacl.so.* /lib
+	#ln -sfv ../../lib/$(readlink /usr/lib/libacl.so) /usr/lib/libacl.so
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
 
-	mkdir -p $PKG/lib
-	mv -v $PKG/usr/lib/libacl.so.* $PKG/lib
-	ln -sfv ../../lib/$(readlink $PKG/usr/lib/libacl.so) $PKG/usr/lib/libacl.so
+rm -fr $TMP	
+	
 
-	rm -fr $PKG/usr/share/doc
-}

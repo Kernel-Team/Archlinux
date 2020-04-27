@@ -1,36 +1,49 @@
-# description	: The GRand Unified Bootloader
-# homepage	: https://www.gnu.org/software/grub/
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-# depends	: gettext bash xz fuse2 python3
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=grub
 version=2.04
-release=1
-backup="etc/default/grub"
-source="https://ftp.gnu.org/gnu/$name/$name-$version.tar.xz
-	grub.default
-	detect-venom-fallback-initrd.patch"
+ 
+fetch "https://ftp.gnu.org/gnu/$name/$name-$version.tar.xz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
-build() {
-	cd $name-$version
-
-	patch -Np1 -i $SRC/detect-venom-fallback-initrd.patch
-
-	# fix os name
-	sed 's|GNU/Linux|Linux|' -i "util/grub.d/10_linux.in"
-
-	./configure --prefix=/usr \
+	./configure --prefix=/usr                          \
 	            --sbindir=/sbin \
 	            --sysconfdir=/etc \
 	            --disable-efiemu \
 	            --disable-werror \
-		    --enable-grub-mount \
 		    --disable-nls
-	make
-	make DESTDIR=$PKG install
 
-	rm -r $PKG/usr/share/info
+        make
+	make install
+	mv -v /etc/bash_completion.d/grub /usr/share/bash-completion/completions
 
-	# borrow from Arch
-	install -D -m0644 $SRC/grub.default $PKG/etc/default/grub
-}
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
+
+rm -fr $TMP	
+	
+

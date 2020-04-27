@@ -1,17 +1,34 @@
-# description	: Programs for finding and viewing man pages
-# homepage	: https://www.nongnu.org/man-db/
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-# depends	: bash gdbm groff less libpipeline zlib
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=man-db
 version=2.9.1
-release=1
-source="https://savannah.nongnu.org/download/man-db/$name-$version.tar.xz"
+ 
+fetch "https://savannah.nongnu.org/download/man-db/$name-$version.tar.xz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
-build() {
-	cd $name-$version
-
-	./configure --prefix=/usr \
+	./configure --prefix=/usr                          \
 	            --sysconfdir=/etc \
 		    --libexecdir=/usr/lib \
 	            --disable-setuid \
@@ -22,6 +39,14 @@ build() {
 	            --with-systemdtmpfilesdir=no \
 		    --with-systemdsystemunitdir=no \
 		    --disable-nls
-	make
-	make DESTDIR=$PKG install
-}
+
+        make
+	make install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
+
+rm -fr $TMP	
+	
+

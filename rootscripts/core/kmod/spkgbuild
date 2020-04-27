@@ -1,29 +1,47 @@
-# description	: Libraries and utilities for loading kernel modules
-# homepage	: https://git.kernel.org/?p=utils/kernel/kmod/kmod.git;a=summary
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-# depends	: xz zlib
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=kmod
 version=27
-release=1
-source="https://www.kernel.org/pub/linux/utils/kernel/$name/$name-$version.tar.xz"
+ 
+fetch "https://www.kernel.org/pub/linux/utils/kernel/$name/$name-$version.tar.xz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
-build() {
-	cd $name-$version
-
-	./configure --prefix=/usr          \
+	./configure --prefix=/usr                          \
 	            --bindir=/bin          \
 	            --sysconfdir=/etc      \
-	            --with-rootlibdir=/lib \
+	            --with-rootlibdir=/usr/lib \
 	            --with-xz              \
 	            --with-zlib
-	make
-	make DESTDIR=$PKG install
 
-	mkdir -p $PKG/sbin
-	for target in depmod insmod lsmod modinfo modprobe rmmod; do
-	  ln -sfv ../bin/kmod $PKG/sbin/$target
-	done
+        make
+	make install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
 
-	ln -sfv kmod $PKG/bin/lsmod
-}
+rm -fr $TMP	
+	
+

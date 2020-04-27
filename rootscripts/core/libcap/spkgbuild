@@ -1,27 +1,40 @@
-# description	: Implements the user-space interfaces to the POSIX 1003.1e capabilities available in Linux kernels
-# homepage	: https://sites.google.com/site/fullycapable/
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-# depends	: attr linux-api-headers
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=libcap
 version=2.33
-release=1
-source="https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/$name-$version.tar.xz"
+ 
+fetch "https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/$name-$version.tar.xz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
-build() {
-	cd $name-$version
+	sed -i '/install.*STA...LIBNAME/d' libcap/Makefile
+	make lib=lib
+	make lib=lib install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
 
-	# use our buildflags
-	sed -i "s/CFLAGS :=/CFLAGS += \$(CPPFLAGS) /" Make.Rules
-	sed -i "s/LDFLAGS :=/LDFLAGS +=/" Make.Rules
-
-	# Disable tests, as they cause cross-build failure
-	sed -e '/test:/,/.sh/d' -e '/tests/d' -i Makefile
-
-	make GOLANG=no RAISE_SETFCAP=no lib=lib prefix=/usr DESTDIR=$PKG install
-	chmod -v 755 $PKG/usr/lib/libcap.so
-
-	mkdir -p $PKG/lib
-	mv -v $PKG/usr/lib/libcap.so.* $PKG/lib
-	ln -sfv ../../lib/$(readlink $PKG/usr/lib/libcap.so) $PKG/usr/lib/libcap.so
-}
+rm -fr $TMP	
+	

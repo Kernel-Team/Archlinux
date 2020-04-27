@@ -1,20 +1,33 @@
-# description	: Utilities for showing and setting the basic system characteristics
-# homepage	: https://www.gnu.org/software/coreutils/
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-# depends	: acl attr gmp
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=coreutils
 version=8.32
-release=1
-source="https://ftp.gnu.org/gnu/$name/$name-$version.tar.xz
-	$name-i18n-1.patch"
+ 
+fetch "https://ftp.gnu.org/gnu/$name/$name-$version.tar.xz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
-build() {
-	cd $name-$version
-
-	# fixes POSIX requires that programs from Coreutils recognize
-	# character boundaries correctly even in multibyte locales
-	#patch -Np1 -i ../$name-i18n-1.patch
 	sed -i '/test.lock/s/^/#/' gnulib-tests/gnulib.mk
 
 	autoreconf -fiv
@@ -25,21 +38,12 @@ build() {
 		--enable-no-install-program=kill,uptime \
 		--disable-nls
 	FORCE_UNSAFE_CONFIGURE=1 make
-	make DESTDIR=$PKG install
+	make install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
 
-	mkdir -pv $PKG/bin \
-	          $PKG/usr/sbin
+rm -fr $TMP	
+	
 
-	for i in cat chgrp chmod chown cp date dd df echo \
-		false ln ls mkdir mknod mv pwd rm rmdir \
-		stty sync true uname head sleep nice; do
-		mv -v $PKG/usr/bin/$i $PKG/bin
-	done
-
-	mv -v $PKG/usr/bin/chroot $PKG/usr/sbin
-	mkdir -pv $PKG/usr/share/man/man8
-	mv -v $PKG/usr/share/man/man1/chroot.1 $PKG/usr/share/man/man8/chroot.8
-	sed -i s/\"1\"/\"8\"/1 $PKG/usr/share/man/man8/chroot.8
-
-	rm -r $PKG/usr/share/info
-}

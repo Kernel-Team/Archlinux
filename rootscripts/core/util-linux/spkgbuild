@@ -1,35 +1,52 @@
-# description	: Utilities for handling file systems, consoles, partitions, and messages
-# depends	: pcre2 ncurses zlib readline eudev
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=util-linux
 version=2.35.1
-release=1
-
-case $version in
-	*.*.*) _ver=${version%.*};;
-	*.*) _ver=$version;;
-esac
-
-source="https://www.kernel.org/pub/linux/utils/$name/v$_ver/$name-$version.tar.xz"
-
-build() {
-	cd $name-$version
-
-	mkdir -pv $PKG/var/lib/hwclock
+ 
+fetch "https://www.kernel.org/pub/linux/utils/$name/v$_ver/$name-$version.tar.xz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
 	./configure ADJTIME_PATH=/var/lib/hwclock/adjtime   \
-	            --disable-chfn-chsh  \
-	            --disable-login      \
-	            --disable-nologin    \
-	            --disable-su         \
-	            --disable-setpriv    \
-	            --disable-runuser    \
-	            --disable-pylibmount \
-	            --disable-static     \
-	            --without-python     \
-	            --without-systemd    \
-		    --disable-nls        \
-	            --without-systemdsystemunitdir
-	make
-	make DESTDIR=$PKG install
-}
+            --docdir=/usr/share/doc/util-linux-2.35.1 \
+            --disable-chfn-chsh  \
+            --disable-login      \
+            --disable-nologin    \
+            --disable-su         \
+            --disable-setpriv    \
+            --disable-runuser    \
+            --disable-pylibmount \
+            --disable-static     \
+            --without-python
+
+        make
+	make install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
+
+rm -fr $TMP	
+	
+

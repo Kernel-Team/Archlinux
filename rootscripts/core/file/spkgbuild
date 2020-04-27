@@ -1,15 +1,32 @@
-# description	: Utility for determining the type of a given file or files
-# homepage	: https://www.darwinsys.com/file/
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-# depends	: zlib
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=file
 version=5.38
-release=1
-source="ftp://ftp.astron.com/pub/$name/$name-$version.tar.gz"
-
-build() {
-	cd $name-$version
+ 
+fetch " ftp://ftp.astron.com/pub/$name/$name-$version.tar.gz " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
 	./configure \
 		--prefix=/usr \
@@ -17,5 +34,12 @@ build() {
                 --enable-static \
                 --disable-libseccomp
 	make
-	make DESTDIR=$PKG install
-}
+	make install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
+
+rm -fr $TMP	
+	
+

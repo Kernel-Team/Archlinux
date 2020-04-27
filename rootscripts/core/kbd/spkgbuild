@@ -1,29 +1,45 @@
-# description	: Key-table files, console fonts, and keyboard utilities
-# homepage	: http://www.kbd-project.org/
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=kbd
 version=2.2.0
-release=1
-source="https://www.kernel.org/pub/linux/utils/$name/$name-$version.tar.xz
-	$name-backspace-1.patch"
-
-build() {
-	cd $name-$version
-
-	patch -Np1 -i ../$name-backspace-1.patch
+ 
+fetch "https://www.kernel.org/pub/linux/utils/$name/$name-$version.tar.xz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
 	sed -i 's/\(RESIZECONS_PROGS=\)yes/\1no/g' configure
 	sed -i 's/resizecons.8 //' docs/man/man8/Makefile.in
 
-	./configure --prefix=/usr --disable-vlock --disable-nls
-	make
-	make DESTDIR=$PKG install
+	PKG_CONFIG_PATH=/tools/lib/pkgconfig ./configure --prefix=/usr --disable-vlock
 
-	mkdir -p $PKG/bin
-	mv -v $PKG/usr/bin/dumpkeys \
-	      $PKG/usr/bin/kbd_mode \
-	      $PKG/usr/bin/loadkeys \
-	      $PKG/usr/bin/setfont \
-	      $PKG/bin
-}
+        make
+	make install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
+
+rm -fr $TMP	
+	
+

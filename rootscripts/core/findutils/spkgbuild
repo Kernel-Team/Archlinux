@@ -1,27 +1,47 @@
-# description	: Programs to find files
-# homepage	: https://www.gnu.org/software/findutils
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-# depends	: bash
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=findutils
 version=4.7.0
-release=1
-source="https://ftp.gnu.org/gnu/$name/$name-$version.tar.xz"
+ 
+fetch "https://ftp.gnu.org/gnu/$name/$name-$version.tar.xz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
-build() {
-	cd $name-$version
+	./configure --prefix=/usr                          \
+		    --localstatedir=/var/lib/locate \
+       		    --disable-nls
 
-	./configure \
-		--prefix=/usr \
-		--libexecdir=/usr/lib/$name \
-		--localstatedir=/var/lib/locate \
-		--disable-nls
-	make
-	make DESTDIR=$PKG install
+        make
+	make install
+	
+	sed -i 's|find:=${BINDIR}|find:=/bin|' /usr/bin/updatedb
 
-	mkdir -pv $PKG/bin
-	mv -v $PKG/usr/bin/find $PKG/bin
-	sed -i 's|find:=${BINDIR}|find:=/bin|' $PKG/usr/bin/updatedb
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
 
-	rm -r $PKG/usr/share/info
-}
+rm -fr $TMP	
+	
+

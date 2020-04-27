@@ -1,20 +1,44 @@
-# description	: A tool for passing the include path and/or library paths to build tools during the configure and make file execution
-# homepage	: https://pkgconfig.freedesktop.org/wiki/
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=pkg-config
 version=0.29.2
-release=1
-source="https://pkg-config.freedesktop.org/releases/$name-$version.tar.gz"
+ 
+fetch "https://pkg-config.freedesktop.org/releases/$name-$version.tar.gz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
-build() {
-	cd $name-$version
-
-	./configure --prefix=/usr              \
+	./configure --prefix=/usr                          \
 	            --with-internal-glib       \
 	            --disable-host-tool
-	make
-	make DESTDIR=$PKG install
 
-	rm -r $PKG/usr/share/doc
-}
+        make
+	make install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
+
+rm -fr $TMP	
+	
+

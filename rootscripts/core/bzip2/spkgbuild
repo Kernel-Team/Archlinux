@@ -1,36 +1,54 @@
-# description	: Programs for compressing and decompressing files
-# homepage	: https://sources.redhat.com/bzip2
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=bzip2
 version=1.0.8
-release=1
-source="https://www.sourceware.org/pub/bzip2/$name-$version.tar.gz"
-
-build() {
-	cd $name-$version
+ 
+fetch "https://www.sourceware.org/pub/bzip2/$name-$version.tar.gz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
 	sed -i 's@\(ln -s -f \)$(PREFIX)/bin/@\1@' Makefile
 	sed -i "s@(PREFIX)/man@(PREFIX)/share/man@g" Makefile
 
-	# use our optimization
 	[ "${CFLAGS}" ] && sed -i "s|-O2|${CFLAGS}|g" Makefile
 	[ "${CFLAGS}" ] && sed -i "s|-O2|${CFLAGS}|g" Makefile-libbz2_so
-
+	
 	make -f Makefile-libbz2_so
 	make
-	make PREFIX=$PKG/usr install
+	make PREFIX=/usr install
+	
+	cp -v bzip2-shared /bin/bzip2
+	cp -av libbz2.so* /lib
+	ln -sv ../../lib/libbz2.so.1.0 /usr/lib/libbz2.so
+	rm -v /usr/bin/{bunzip2,bzcat,bzip2}
+	ln -sv bzip2 /bin/bunzip2
+	ln -sv bzip2 /bin/bzcat
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
 
-	mkdir -pv $PKG/bin \
-	          $PKG/lib \
-	          $PKG/usr/lib
+rm -fr $TMP	
+	
 
-	cp -v bzip2-shared $PKG/bin/bzip2
-	cp -av libbz2.so* $PKG/lib
-	ln -sv ../../lib/libbz2.so.1.0 $PKG/usr/lib/libbz2.so
-	rm -v $PKG/usr/bin/bunzip2 \
-	      $PKG/usr/bin/bzcat \
-	      $PKG/usr/bin/bzip2
-	ln -sv bzip2 $PKG/bin/bunzip2
-	ln -sv bzip2 $PKG/bin/bzcat
-}

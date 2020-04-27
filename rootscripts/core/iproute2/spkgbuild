@@ -1,14 +1,32 @@
-# description	: Programs for basic and advanced IPV4-based networking
-# homepage	: https://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=iproute2
 version=5.6.0
-release=1
-source="https://www.kernel.org/pub/linux/utils/net/$name/$name-$version.tar.xz"
-
-build() {
-	cd $name-$version
+ 
+fetch "https://www.kernel.org/pub/linux/utils/net/$name/$name-$version.tar.xz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
 	sed -i /ARPD/d Makefile
 	rm -fv man/man8/arpd.8
@@ -16,5 +34,13 @@ build() {
 	[ -e /usr/lib/pkgconfig/xtables.pc ] || sed -i 's/m_ipt.o//' tc/Makefile
 
 	make
-	make DESTDIR=$PKG install
-}
+	make DESTDIR=DOCDIR=/usr/share/doc/iproute2-5.6.0 install
+
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
+
+rm -fr $TMP	
+	
+

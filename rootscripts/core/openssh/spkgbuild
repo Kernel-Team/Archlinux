@@ -1,31 +1,48 @@
-# description	: Free version of the SSH connectivity tools
-# depends	: openssl xauth
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=openssh
 version=8.2p1
-release=3
-source="https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/$name-$version.tar.gz
-	run"
+ 
+fetch "https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/$name-$version.tar.gz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
-build() {
-	cd $name-$version
-
-	./configure --prefix=/usr                     \
+	./configure --prefix=/usr                          \
 	            --sysconfdir=/etc/ssh             \
 		    --libexecdir=/usr/lib/$name       \
 	            --with-md5-passwords              \
 	            --with-privsep-path=/var/lib/sshd
-	make
-	make DESTDIR=$PKG install
 
-	install -v -m755    contrib/ssh-copy-id $PKG/usr/bin
-	install -v -m644    contrib/ssh-copy-id.1 \
-	                    $PKG/usr/share/man/man1
+        make
+	
+	sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
+	make install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
 
-	sed '/^#ChallengeResponseAuthentication yes$/c ChallengeResponseAuthentication no' \
-	    -i $PKG/etc/ssh/sshd_config
+rm -fr $TMP	
+	
 
-	# runit service
-        install -Dm755 $SRC/run $PKG/etc/sv/sshd/run
-        ln -s /run/runit/supervise.sshd $PKG/etc/sv/sshd/supervise
-}

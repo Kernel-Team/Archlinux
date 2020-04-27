@@ -1,27 +1,45 @@
-# description	: The Bourne-Again SHell
-# homepage	: https://www.gnu.org/software/bash/bash.html
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-# depends	: ncurses readline
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=bash
 version=5.0
-release=1
-source="https://ftp.gnu.org/gnu/$name/$name-$version.tar.gz"
+ 
+fetch "https://ftp.gnu.org/gnu/$name/$name-$version.tar.gz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
-build() {
-	cd $name-$version
-
-	./configure --prefix=/usr \
+	./configure --prefix=/usr                          \
 	            --without-bash-malloc \
 	            --with-installed-readline \
 		    --disable-nls
 	make
-	make DESTDIR=$PKG install
+	make install
 
-	mkdir -p $PKG/bin
-	mv $PKG/usr/bin/bash $PKG/bin
-	ln -s bash $PKG/bin/sh
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
 
-	rm -fr $PKG/usr/share/doc \
-	       $PKG/usr/share/info
-}
+rm -fr $TMP	
+	
+

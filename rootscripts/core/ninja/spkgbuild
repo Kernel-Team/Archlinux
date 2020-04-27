@@ -1,16 +1,52 @@
-# description	: Small build system with a focus on speed
-# homepage	: https://ninja-build.org/
-# maintainer	: Emmett1, emmett1.2miligrams at gmail.com
-# depends	: python3
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=ninja
 version=1.10.0
-release=1
-source="https://github.com/ninja-build/ninja/archive/v$version/ninja-$version.tar.gz"
+ 
+fetch "https://github.com/ninja-build/ninja/archive/v$version/ninja-$version.tar.gz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
+	
+	export NINJAJOBS=4
+	sed -i '/int Guess/a \
+	  int   j = 0;\
+	  char* jobs = getenv( "NINJAJOBS" );\
+	  if ( jobs != NULL ) j = atoi( jobs );\
+	  if ( j > 0 ) return j;\
+	' src/ninja.cc
 
-build() {
-	cd $name-$version
+	python3 configure.py --bootstrap
+	
+	install -vm755 ninja /usr/bin/
+	install -vDm644 misc/bash-completion /usr/share/bash-completion/completions/ninja
+	install -vDm644 misc/zsh-completion  /usr/share/zsh/site-functions/_ninja
 
-	python3 ./configure.py --bootstrap
-	install -Dm755 ninja $PKG/usr/bin/ninja
-}
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
+
+rm -fr $TMP	
+	
+

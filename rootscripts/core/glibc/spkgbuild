@@ -136,7 +136,7 @@ EOF
         }   
 } 2>&1 | tee $LOG/$filename.log
     
-[ $PIPESTATUS = 0 ] && echo "$NAME-$VERSION" > /usr/scrip_$name || exit $PIPESTATUS
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
 
 rm -fr $TMP	
 	

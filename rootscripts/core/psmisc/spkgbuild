@@ -1,21 +1,42 @@
-# description	: Programs for displaying information about running processes
-# homepage	: http://psmisc.sourceforge.net/index.html
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-# depends	: ncurses
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=psmisc
 version=23.3
-release=1
-source="https://sourceforge.net/projects/psmisc/files/psmisc/psmisc-$version.tar.xz"
+ 
+fetch "https://sourceforge.net/projects/psmisc/files/psmisc/psmisc-$version.tar.xz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
-build() {
-	cd $name-$version
+	./configure --prefix=/usr                          \
 
-	./configure --prefix=/usr --disable-nls
-	make
-	make DESTDIR=$PKG install
+        make
+	make install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
 
-	mkdir -p $PKG/bin
-	mv -v $PKG/usr/bin/fuser   $PKG/bin
-	mv -v $PKG/usr/bin/killall $PKG/bin
-}
+rm -fr $TMP	
+	
+

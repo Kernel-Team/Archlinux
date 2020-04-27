@@ -1,29 +1,43 @@
-# description	: Utilities for internationalization and localization
-# homepage	: https://www.gnu.org/software/gettext/
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-# depends	: acl gcc bash
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=gettext
 version=0.20.1
-release=1
-source="https://ftp.gnu.org/gnu/$name/$name-$version.tar.xz"
+ 
+fetch "https://ftp.gnu.org/gnu/$name/$name-$version.tar.xz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
-build() {
-	cd $name-$version
+	./configure --prefix=/usr                          \
+		    --disable-static
 
-	# suppress two invocations of test-lock which on some machines can loop forever
-	sed -i '/^TESTS =/d' gettext-runtime/tests/Makefile.in
-	sed -i 's/test-lock..EXEEXT.//' gettext-tools/gnulib-tests/Makefile.in
+        make
+	make install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
 
-	./configure --prefix=/usr \
-	            --disable-static \
-		    --disable-nls
-	make || make -j1
-	make -j1 DESTDIR=$PKG install
-
-	rm -r $PKG/usr/share/doc \
-	      $PKG/usr/share/info
-
-	chmod -v 0755 $PKG/usr/lib/preloadable_libintl.so
-}
+rm -fr $TMP	
+	
 

@@ -1,0 +1,35 @@
+#!/bin/bash 
+set -e
+
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+
+name=adjusting-the-toolchain
+version=${Adjusting_VER}
+
+
+{ time \
+   {
+
+	
+	mv -v /tools/bin/{ld,ld-old}
+	mv -v /tools/$(uname -m)-pc-linux-gnu/bin/{ld,ld-old}
+	mv -v /tools/bin/{ld-new,ld}
+	ln -sv /tools/bin/ld /tools/$(uname -m)-pc-linux-gnu/bin/ld
+
+	gcc -dumpspecs | sed -e 's@/tools@@g'                   \
+	    -e '/\*startfile_prefix_spec:/{n;s@.*@/usr/lib/ @}' \
+	    -e '/\*cpp:/{n;s@$@ -isystem /usr/include@}' >      \
+	    `dirname $(gcc --print-libgcc-file-name)`/specs
+	}
+}
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" >> /usr/scrip_$name || exit $PIPESTATUS
+
+rm -fr $TMP

@@ -1,3 +1,45 @@
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
+name=meson
+version=0.54.0
+ 
+fetch "https://github.com/mesonbuild/meson/releases/download/$version/$name-$version.tar.gz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
+
+	python3 setup.py build
+	python3 setup.py install --root=dest
+	cp -rv dest/* /
+
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
+
+rm -fr $TMP	
+	
+
 # description	: Open source build system meant to be both extremely fast, and, even more importantly, as user friendly as possible
 # depends	: python3 ninja python3-setuptools
 
@@ -9,5 +51,7 @@ source="https://github.com/mesonbuild/meson/releases/download/$version/$name-$ve
 build() {
 	cd $name-$version
 	python3 setup.py build
-	python3 setup.py install --root=$PKG
+	python3 setup.py install --root=dest
+	cp -rv dest/* /
+	
 }

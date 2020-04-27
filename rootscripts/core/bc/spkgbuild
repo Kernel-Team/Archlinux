@@ -1,17 +1,35 @@
-# description	: An arbitrary precision numeric processing language
-# homepage	: https://www.gnu.org/software/bc/
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-# depends	: readline
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=bc
 version=1.07.1
-release=1
-source="https://ftp.gnu.org/gnu/bc/$name-$version.tar.gz"
+ 
+fetch "https://ftp.gnu.org/gnu/bc/$name-$version.tar.gz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
-build() {
-	cd $name-$version
 
-	cat > bc/fix-libmath_h << "EOF"
+        cat > bc/fix-libmath_h << "EOF"
 #! /bin/bash
 sed -e '1   s/^/{"/' \
     -e     's/$/",/' \
@@ -23,13 +41,21 @@ sed -e '$ s/$/0}/' \
     -i libmath.h
 EOF
 
-	sed -i -e '/flex/s/as_fn_error/: ;; # &/' configure
+        sed -i -e '/flex/s/as_fn_error/: ;; # &/' configure
 
-	./configure --prefix=/usr           \
-	            --with-readline         \
-	            --mandir=/usr/share/man \
-	            --infodir=/usr/share/info
-	make
-	make DESTDIR=$PKG install
-	rm -r $PKG/usr/share/info
-}
+        ./configure --prefix=/usr           \
+                    --with-readline         \
+                    --mandir=/usr/share/man \
+                    --infodir=/usr/share/info
+
+
+        make
+	make install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
+
+rm -fr $TMP	
+	
+

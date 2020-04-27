@@ -1,28 +1,50 @@
-# description	: Programs for monitoring processes
-# homepage	: https://gitlab.com/procps-ng/procps
-# maintainer	: emmett1, emmett1.2miligrams at gmail.com
-# depends	: ncurses
-
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/../../functions
+source $(dirname $0)/../../pkgversion
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
 name=procps-ng
-version=3.3.16
-release=1
-source="https://sourceforge.net/projects/procps-ng/files/Production/$name-$version.tar.xz"
+version=3.3.15
+ 
+fetch "https://sourceforge.net/projects/procps-ng/files/Production/$name-$version.tar.xz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
 
-build() {
-	cd $name-$version
+	./configure --prefix=/usr                          \
+	            --exec-prefix=                           \
+	            --libdir=/usr/lib                        \
+        	    --docdir=/usr/share/doc/procps-ng-3.3.15 \
+	            --disable-static                         \
+        	    --disable-kill                           \
 
-	./configure --prefix=/usr \
-	            --exec-prefix= \
-	            --libdir=/usr/lib \
-	            --disable-static \
-	            --disable-kill \
-		    --disable-nls
-	make
-	make DESTDIR=$PKG install
 
-	rm -r $PKG/usr/share/doc
+#	            --with-systemd
 
-	mkdir -pv $PKG/lib
-	mv -v $PKG/usr/lib/libprocps.so.* $PKG/lib
-	ln -sfv ../../lib/$(readlink $PKG/usr/lib/libprocps.so) $PKG/usr/lib/libprocps.so
-}
+        make
+	make install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
+
+rm -fr $TMP	
+	
+
