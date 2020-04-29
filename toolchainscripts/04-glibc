@@ -35,9 +35,8 @@ tar xf $SRC/$tarballname -C $TMP
 		  --build=$(../scripts/config.guess) \
 		  --disable-multilib		     \
 		  --disable-nls   		     \
-		  --disable-libstdcxx-threads	     \
-		  --disable-libstdcxx-pch		     \
-		  --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/9.2.0		     
+		  --enable-kernel=3.2                \
+	          --with-headers=/tools/include
 
 	make
 	make install
