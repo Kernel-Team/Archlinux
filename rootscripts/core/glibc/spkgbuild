@@ -11,9 +11,9 @@ LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
  
 name=glibc
-version=${GLIBC_VER}
+version=2.31
  
-fetch "https://mirrors.tuna.tsinghua.edu.cn/gnu/glibc/glibc-$GLIBC_VER.tar.xz" $SRC
+fetch "https://mirrors.tuna.tsinghua.edu.cn/gnu/glibc/glibc-$version.tar.xz" $SRC
  
 [ "$1" = "fetch" ] && exit 0
  
@@ -27,7 +27,7 @@ tar xf $SRC/$tarballname -C $TMP
  
         cd $TMP/$name-$version
 	pwd
- 	cp $TMP/../glibc-fhs-1.patch $TMP/
+ 	cp $SRC/glibc-fhs-1.patch ../
 	patch -Np1 -i ../glibc-fhs-1.patch
 
         mkdir -v build

@@ -2,7 +2,6 @@
 set -e
 
 PKG=(
-Creating-Directories
 linux-api-headers
 man-pages
 glibc
@@ -65,10 +64,10 @@ man-db
 tar
 texinfo
 vim
+util-linux
 systemd
 dbus
 procps-ng
-util-linux
 e2fsprogs
 )
 SCRIPTDIR=$(dirname $0)/rootscripts/core/

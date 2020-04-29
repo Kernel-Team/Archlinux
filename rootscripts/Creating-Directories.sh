@@ -2,7 +2,7 @@
 set -e
 set -x
 
-mkdir -pv /{bin,boot,etc/{opt,sysconfig},home,lib/firmware,mnt,opt}
+mkdir -pv /{bin,boot,etc/{opt,sysconfig},home,mnt,opt}
 mkdir -pv /{media/{floppy,cdrom},sbin,srv,var}
 install -dv -m 0750 /root
 install -dv -m 1777 /tmp /var/tmp
@@ -12,10 +12,9 @@ mkdir -v  /usr/{,local/}share/{misc,terminfo,zoneinfo}
 mkdir -v  /usr/libexec
 mkdir -pv /usr/{,local/}share/man/man{1..8}
 mkdir -v  /usr/lib/pkgconfig
-
-case $(uname -m) in
-	 x86_64) mkdir -v /lib64 ;;
- esac
+mkdir -v  /usr/lib64
+ln -sv /usr/lib64 /lib64
+ln -sv /usr/lib /lib
 
  mkdir -v /var/{log,mail,spool}
  ln -sv /run /var/run

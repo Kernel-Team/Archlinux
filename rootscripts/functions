@@ -3,8 +3,6 @@
 JOBS=$(nproc)
 export MAKEFLAGS="-j${JOBS}"
 
-#PATH=/tools/bin:/bin:/usr/bin
-
 export LC_ALL=C PATH
 
 fetch() {

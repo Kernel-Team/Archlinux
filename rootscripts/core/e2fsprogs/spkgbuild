@@ -27,14 +27,20 @@ tar xf $SRC/$tarballname -C $TMP
  
         cd $TMP/$name-$version
 
-	./configure --prefix=/usr           \
+	mkdir -v build
+	cd       build
+
+	../configure --prefix=/usr           \
              --bindir=/bin           \
              --with-root-prefix=""   \
              --enable-elf-shlibs     \
-             --disable-libblkid      \
-             --disable-libuuid       \
-             --disable-uuidd         \
-             --disable-fsck
+
+
+       #      --disable-libblkid      \
+       #      --disable-libuuid       \
+       #      --disable-uuidd         \
+       #      --disable-fsck          \
+       #	    --disable-nls
 
         make
 	make install
