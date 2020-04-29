@@ -2,6 +2,7 @@
 set -e
 
 PKG=(
+Creating-Directories
 linux-api-headers
 man-pages
 glibc
