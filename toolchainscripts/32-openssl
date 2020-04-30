@@ -26,7 +26,7 @@ tar xf $SRC/$tarballname -C $TMP
 
 	cd $TMP/$NAME-$VERSION
 
-	./config --prefix=/tools             \
+	./config --prefix=/tools --build=$LFS_TGT             \
              --openssldir=/tools/etc/ssl \
              --libdir=lib                \
              shared                      \

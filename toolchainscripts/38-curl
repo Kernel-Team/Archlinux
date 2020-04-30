@@ -27,7 +27,7 @@ tar xf $SRC/$tarballname -C $TMP
 	cd $TMP/$NAME-$VERSION
 
 	 ./configure \
-			--prefix=/tools            \
+			--prefix=/tools --build=$LFS_TGT            \
 			--with-ssl                 \
 			--enable-threaded-resolver \
 			--with-ca-bundle=/tools/etc/ssl/certs/ca-certificates.crt

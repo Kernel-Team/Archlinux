@@ -30,14 +30,16 @@ tar xf $SRC/$tarballname -C $TMP
 	cd       build
 	
 	../configure --prefix=/tools            \
+				 --build=$LFS_BLD 	    \
 				 --with-sysroot=$LFS        \
 				 --with-lib-path=/tools/lib \
 				 --target=$LFS_TGT          \
 				 --disable-nls              \
-				 --disable-werror
+				 --disable-werror	    \
+				 --with-abi=64 --with-endlan=little
 	make
 	case $(uname -m) in
-		x86_64) mkdir -v /tools/lib && ln -sv lib /tools/lib64 ;;
+		mips64) mkdir -v /tools/lib && ln -sv lib /tools/lib64 ;;
 	esac
 	make install
 	

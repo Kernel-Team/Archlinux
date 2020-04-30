@@ -36,7 +36,7 @@ tar -xf $SRC/mpc-$MPC_VER.tar.gz -C $TMP/$NAME-$VERSION
 	mv -v gmp-$GMP_VER gmp
 	mv -v mpc-$MPC_VER mpc
 	
-	for file in gcc/config/{linux,i386/linux{,64}}.h
+	for file in gcc/config/{linux,mips/linux}.h
 	do
 	  cp -uv $file{,.orig}
 	  sed -e 's@/lib\(64\)\?\(32\)\?/ld@/tools&@g' \
@@ -50,9 +50,8 @@ tar -xf $SRC/mpc-$MPC_VER.tar.gz -C $TMP/$NAME-$VERSION
 	done
 
 	case $(uname -m) in
-	  x86_64)
-            sed -e '/m64=/s/lib64/lib/' \
-		-i.orig gcc/config/i386/t-linux64
+	  mips64)
+   	    sed -e's/lib64/lib/g' -i.orig gcc/config/mips/t-linux64
 	  ;;
 	esac
 		
@@ -61,6 +60,7 @@ tar -xf $SRC/mpc-$MPC_VER.tar.gz -C $TMP/$NAME-$VERSION
 	cd       build
 
 	../configure                                       \
+		--build=$LFS_BLD                              \
 		--target=$LFS_TGT                              \
 		--prefix=/tools                                \
 		--with-glibc-version=2.11                      \
@@ -81,7 +81,12 @@ tar -xf $SRC/mpc-$MPC_VER.tar.gz -C $TMP/$NAME-$VERSION
 		--disable-libssp                               \
 		--disable-libvtv                               \
 		--disable-libstdcxx                            \
-		--enable-languages=c,c++
+		--enable-languages=c,c++		       \
+		--with-abi=64				       \
+		--with-arch=mips64r2 			       \
+		--with-tune=loongson3a 			       \
+		--with-endlan=little 
+
 	make
 	make install
 	

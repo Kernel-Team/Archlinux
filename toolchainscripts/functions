@@ -3,7 +3,9 @@
 JOBS=$(nproc)
 export MAKEFLAGS="-j${JOBS}"
 export LFS="/mnt/lfs"
-export LFS_TGT=$(uname -m)-lfs-linux-gnu
+export LFS_TGT=$(uname -m)el-lfs-linux-gnu
+export LFS_BLD=mips64el-redhat-linux-gnu 
+export BUILD64="-mabi=64 -march=mips64r2 -mtune=loongson3a"
 
 PATH=/tools/bin:/bin:/usr/bin
 

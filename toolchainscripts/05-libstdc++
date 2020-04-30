@@ -30,6 +30,7 @@ tar xf $SRC/$tarballname -C $TMP
 	cd       build
 	
 	../libstdc++-v3/configure           \
+		--build=$LFS_BLD                \
 		--host=$LFS_TGT                 \
 		--prefix=/tools                 \
 		--disable-multilib              \

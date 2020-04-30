@@ -26,7 +26,7 @@ tar xf $SRC/$tarballname -C $TMP
 
 	cd $TMP/$NAME-$VERSION
 
-	./configure --prefix=/tools --enable-install-program=hostname
+	./configure --prefix=/tools --build=$LFS_TGT --enable-install-program=hostname
 	make
 	make install
 	

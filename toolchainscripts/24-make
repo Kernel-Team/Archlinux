@@ -29,7 +29,7 @@ tar xf $SRC/$tarballname -C $TMP
 	#work around an error caused by glibc-2.27 and later
 	sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
 	
-	./configure --prefix=/tools --without-guile
+	./configure --prefix=/tools --build=$LFS_TGT --without-guile
 	make
 	make install
 	
