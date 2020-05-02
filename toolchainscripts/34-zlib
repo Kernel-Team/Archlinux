@@ -26,7 +26,7 @@ tar xf $SRC/$tarballname -C $TMP
 
 	cd $TMP/$NAME-$VERSION
 
-	./configure --prefix=/tools --build=$LFS_TGT
+	./configure --prefix=/tools 
 	make
 	make install
 	

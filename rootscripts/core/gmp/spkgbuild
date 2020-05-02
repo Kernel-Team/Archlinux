@@ -29,7 +29,6 @@ tar xf $SRC/$tarballname -C $TMP
 
 	./configure --prefix=/usr    \
 	            --enable-cxx     \
-	            --build=x86_64-unknown-linux-gnu \
 	            --disable-static
 
         make

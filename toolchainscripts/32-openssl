@@ -26,11 +26,14 @@ tar xf $SRC/$tarballname -C $TMP
 
 	cd $TMP/$NAME-$VERSION
 
-	./config --prefix=/tools --build=$LFS_TGT             \
+        ./Configure linux64-mips64 \
+             --prefix=/tools         \
              --openssldir=/tools/etc/ssl \
              --libdir=lib                \
              shared                      \
              no-ssl3-method
+
+    make depend
     make
     make -j1 MANDIR=/tools/share/man MANSUFFIX=ssl install
 	
