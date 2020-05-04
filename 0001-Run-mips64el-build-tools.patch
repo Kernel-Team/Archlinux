@@ -1,0 +1,165 @@
+From 840a8bc96a3bf28bb19a85201b2d683f1f78e025 Mon Sep 17 00:00:00 2001
+From: Shi Pujin <shipujin.t@lemote.com>
+Date: Sat, 2 May 2020 11:36:24 +0800
+Subject: [PATCH 1/2] Run mips64el build tools
+
+---
+ rootscripts/core/binutils/spkgbuild       |  2 +-
+ rootscripts/core/gcc/spkgbuild            |  6 +++---
+ rootscripts/core/gmp/spkgbuild            |  1 -
+ toolchainscripts/32-openssl               |  5 ++++-
+ toolchainscripts/34-zlib                  |  2 +-
+ toolchainscripts/80-cleaning              |  2 +-
+ toolchainscripts/90-Creating-File-Systems |  2 +-
+ toolchainscripts/MAKE-perl.sh             | 20 --------------------
+ toolchainscripts/pkgversion               |  2 +-
+ 9 files changed, 12 insertions(+), 30 deletions(-)
+ delete mode 100644 toolchainscripts/MAKE-perl.sh
+
+diff --git a/rootscripts/core/binutils/spkgbuild b/rootscripts/core/binutils/spkgbuild
+index 9592cbb..483043b 100755
+--- a/rootscripts/core/binutils/spkgbuild
++++ b/rootscripts/core/binutils/spkgbuild
+@@ -11,7 +11,7 @@ LOG=${LOG:-$(dirname $0)/log}
+ SRC=${SRC:-$(dirname $0)/src}
+  
+ name=binutils
+-version=2.34
++version=2.32
+  
+ fetch "https://mirrors.tuna.tsinghua.edu.cn/gnu/binutils/binutils-$version.tar.xz  " $SRC
+  
+diff --git a/rootscripts/core/gcc/spkgbuild b/rootscripts/core/gcc/spkgbuild
+index a3742e5..eb58b66 100755
+--- a/rootscripts/core/gcc/spkgbuild
++++ b/rootscripts/core/gcc/spkgbuild
+@@ -11,7 +11,7 @@ LOG=${LOG:-$(dirname $0)/log}
+ SRC=${SRC:-$(dirname $0)/src}
+  
+ name=gcc
+-version=9.3.0
++version=8.2.0
+  
+ fetch "https://github.com/shadow-maint/shadow/releases/download/$version/$name-$version.tar.xz  " $SRC
+  
+@@ -28,8 +28,8 @@ tar xf $SRC/$tarballname -C $TMP
+         cd $TMP/$name-$version
+ 
+ 	# /lib is 64bit libraries directory
+-	sed -e '/m64=/s/lib64/lib/' \
+-	    -i.orig gcc/config/i386/t-linux64
++	sed -e 's/lib64/lib/g' \
++            -i.orig gcc/config/mips/t-linux64
+ 
+ 	# Do not run fixincludes
+ 	sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
+diff --git a/rootscripts/core/gmp/spkgbuild b/rootscripts/core/gmp/spkgbuild
+index 24ec867..97c39c7 100755
+--- a/rootscripts/core/gmp/spkgbuild
++++ b/rootscripts/core/gmp/spkgbuild
+@@ -29,7 +29,6 @@ tar xf $SRC/$tarballname -C $TMP
+ 
+ 	./configure --prefix=/usr    \
+ 	            --enable-cxx     \
+-	            --build=x86_64-unknown-linux-gnu \
+ 	            --disable-static
+ 
+         make
+diff --git a/toolchainscripts/32-openssl b/toolchainscripts/32-openssl
+index 4fd0f33..34405b7 100755
+--- a/toolchainscripts/32-openssl
++++ b/toolchainscripts/32-openssl
+@@ -26,11 +26,14 @@ tar xf $SRC/$tarballname -C $TMP
+ 
+ 	cd $TMP/$NAME-$VERSION
+ 
+-	./config --prefix=/tools --build=$LFS_TGT             \
++        ./Configure linux64-mips64 \
++             --prefix=/tools         \
+              --openssldir=/tools/etc/ssl \
+              --libdir=lib                \
+              shared                      \
+              no-ssl3-method
++
++    make depend
+     make
+     make -j1 MANDIR=/tools/share/man MANSUFFIX=ssl install
+ 	
+diff --git a/toolchainscripts/34-zlib b/toolchainscripts/34-zlib
+index 3c7a5f4..96febf7 100755
+--- a/toolchainscripts/34-zlib
++++ b/toolchainscripts/34-zlib
+@@ -26,7 +26,7 @@ tar xf $SRC/$tarballname -C $TMP
+ 
+ 	cd $TMP/$NAME-$VERSION
+ 
+-	./configure --prefix=/tools --build=$LFS_TGT
++	./configure --prefix=/tools 
+ 	make
+ 	make install
+ 	
+diff --git a/toolchainscripts/80-cleaning b/toolchainscripts/80-cleaning
+index de04e8f..273cf79 100755
+--- a/toolchainscripts/80-cleaning
++++ b/toolchainscripts/80-cleaning
+@@ -6,4 +6,4 @@ strip --strip-debug /tools/lib/*
+ strip --strip-debug /tools/lib32/*
+ /usr/bin/strip --strip-unneeded /tools/{,s}bin/*
+ rm -rf /tools/{,share}/{info,man,doc}
+-find /tools/{lib,lib32,libexec} -name \*.la -delete
++find /tools/{lib,libexec} -name \*.la -delete
+diff --git a/toolchainscripts/90-Creating-File-Systems b/toolchainscripts/90-Creating-File-Systems
+index dc9466d..2955851 100755
+--- a/toolchainscripts/90-Creating-File-Systems
++++ b/toolchainscripts/90-Creating-File-Systems
+@@ -2,7 +2,7 @@
+ #set -e
+ set -x
+ 
+-#export LFS="/mnt/lfs"
++export LFS="/mnt/lfs"
+ mkdir -pv $LFS/{dev,proc,sys,run}
+ mknod -m 600 $LFS/dev/console c 5 1
+ mknod -m 666 $LFS/dev/null c 1 3
+diff --git a/toolchainscripts/MAKE-perl.sh b/toolchainscripts/MAKE-perl.sh
+deleted file mode 100644
+index 40c9b21..0000000
+--- a/toolchainscripts/MAKE-perl.sh
++++ /dev/null
+@@ -1,20 +0,0 @@
+-#!/bin/bash
+-set -e
+-set -x
+-
+-export LFS="/mnt/lfs"
+-export LFS_TGT=$(uname -m)el-lfs-linux-gnu
+-export LFS_BLD=mips64el-redhat-linux-gnu 
+-export BUILD64="-mabi=64 -march=mips64r2 -mtune=loongson3a"
+-
+-
+-rm -rf /tmp/build/perl-5.30.2
+-cp /mnt/sources/perl-5.30.2.tar.xz  /tmp/build/
+-cd /tmp/build/
+-tar -xvf perl-5.30.2.tar.xz ;cd perl-5.30.2
+-ls
+-
+-#bash Configure -des -Dprefix=/tools -Dlibs=-lm -Uloclibpth -Ulocincpth
+-./Configure -des -Dprefix=/tools
+-make
+-#make
+diff --git a/toolchainscripts/pkgversion b/toolchainscripts/pkgversion
+index b3b6528..1fa44ad 100755
+--- a/toolchainscripts/pkgversion
++++ b/toolchainscripts/pkgversion
+@@ -15,7 +15,7 @@ BISON_VER=3.3.1
+ BZIP_VER=1.0.6
+ COREUTILS_VER=8.30
+ DIFFUTILS_VER=3.7
+-FILE_VER=5.35
++FILE_VER=5.38
+ FINDUTILS_VER=4.6.0
+ GAWK_VER=4.2.1
+ GETTEXT_VER=0.19.8.1
+-- 
+2.17.2
+

@@ -1,0 +1,44 @@
+From d678d9a1ab55768d4e286c61c590f99eae39ffbd Mon Sep 17 00:00:00 2001
+From: Shi Pujin <shipujin.t@lemote.com>
+Date: Sat, 2 May 2020 15:11:08 +0800
+Subject: [PATCH 2/2] adjusting toolchain name
+
+---
+ rootscripts/core/adjusting-the-toolchain/spkgbuild | 4 ++--
+ toolchainscripts/03-linux-api-headers              | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/rootscripts/core/adjusting-the-toolchain/spkgbuild b/rootscripts/core/adjusting-the-toolchain/spkgbuild
+index a552cf7..dc26533 100755
+--- a/rootscripts/core/adjusting-the-toolchain/spkgbuild
++++ b/rootscripts/core/adjusting-the-toolchain/spkgbuild
+@@ -18,9 +18,9 @@ version=${Adjusting_VER}
+ 
+ 	
+ 	mv -v /tools/bin/{ld,ld-old}
+-	mv -v /tools/$(uname -m)-pc-linux-gnu/bin/{ld,ld-old}
++	mv -v /tools/$(uname -m)el-lfs-linux-gnu/bin/{ld,ld-old}
+ 	mv -v /tools/bin/{ld-new,ld}
+-	ln -sv /tools/bin/ld /tools/$(uname -m)-pc-linux-gnu/bin/ld
++	ln -sv /tools/bin/ld /tools/$(uname -m)el-lfs-linux-gnu/bin/ld
+ 
+ 	gcc -dumpspecs | sed -e 's@/tools@@g'                   \
+ 	    -e '/\*startfile_prefix_spec:/{n;s@.*@/usr/lib/ @}' \
+diff --git a/toolchainscripts/03-linux-api-headers b/toolchainscripts/03-linux-api-headers
+index 2f05e6f..ba064b3 100755
+--- a/toolchainscripts/03-linux-api-headers
++++ b/toolchainscripts/03-linux-api-headers
+@@ -27,8 +27,8 @@ tar xf $SRC/$tarballname -C $TMP
+ 	cd $TMP/$NAME-$VERSION
+ 
+ 	make mrproper
+-        make INSTALL_HDR_PATH=dest headers_install
+-	cp -rv dest/include/* /tools/include
++	make headers
++	cp -rv usr/include/* /tools/include
+ 	
+ 	}
+ } 2>&1 | tee $LOG/$filename.log
+-- 
+2.17.2
+
