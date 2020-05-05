@@ -1,7 +1,6 @@
 #!/bin/bash -e
 
 source $(dirname $0)/functions
-source $(dirname $0)/pkgversion
 
 filename=$(echo $0 | rev | cut -d / -f1 | rev)
 
@@ -9,10 +8,10 @@ TMP=${TMP:-/tmp/build}
 LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
 
-NAME=texinfo
-VERSION=${TEXINFO_VER}
+name=file
+version=5.38
 
-fetch "https://mirrors.tuna.tsinghua.edu.cn/gnu/texinfo/texinfo-$TEXINFO_VER.tar.xz" $SRC
+fetch " ftp://ftp.astron.com/pub/$name/$name-$version.tar.gz " $SRC
 
 [ "$1" = "fetch" ] && exit 0
 
@@ -24,9 +23,15 @@ tar xf $SRC/$tarballname -C $TMP
 { time \
    {
 
-	cd $TMP/$NAME-$VERSION
+	cd $TMP/$name-$version
 
-	./configure --prefix=/tools --build=$LFS_TGT
+	mkdir -v build
+	cd       build
+	
+	../configure --prefix=/tools            \
+		     --prefix=/cross-tools \
+		     --disable-static
+
 	make
 	make install
 	

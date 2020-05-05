@@ -1,0 +1,51 @@
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/functions
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
+name=binutils
+version=2.32
+ 
+fetch "https://mirrors.tuna.tsinghua.edu.cn/gnu/binutils/binutils-$version.tar.xz  " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
+
+	AR=ar AS=as ../binutils-2.24/configure \
+	            --prefix=/cross-tools \
+		    --host=${CLFS_HOST} \
+		    --target=${CLFS_TARGET} \
+		    --with-sysroot=${CLFS} \
+		    --with-lib-path=/tools/lib \
+		    --disable-nls \
+		    --disable-static \
+		    --enable-64-bit-bfd \
+		    --disable-multilib \
+		    --disable-werror \
+		    -mabi=64 -march=mips64r2 -mtune=loongson3a
+
+	make 
+	make install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
+
+rm -fr $TMP	
+	

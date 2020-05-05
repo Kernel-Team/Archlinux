@@ -1,0 +1,44 @@
+#!/bin/bash 
+set -e
+set -x
+ 
+source $(dirname $0)/functions
+ 
+filename=$(echo $0 | rev | cut -d / -f1 | rev)
+ 
+TMP=${TMP:-/tmp/build}
+LOG=${LOG:-$(dirname $0)/log}
+SRC=${SRC:-$(dirname $0)/src}
+ 
+name=mpfr
+version=4.0.2
+ 
+fetch " https://www.mpfr.org/$name-$version/$name-$version.tar.xz " $SRC
+ 
+[ "$1" = "fetch" ] && exit 0
+ 
+rm -fr $TMP
+mkdir -p $TMP $LOG $SRC
+ 
+tar xf $SRC/$tarballname -C $TMP
+ 
+{ time \
+   {
+ 
+        cd $TMP/$name-$version
+
+	LDFLAGS="-Wl,-rpath,/cross-tools/lib" \
+	./configure --prefix=/cross-tools                          \
+	            --disable-static     \
+		    --with-gmp=/cross-tools
+
+        make
+	make install
+        }   
+} 2>&1 | tee $LOG/$filename.log
+    
+[ $PIPESTATUS = 0 ] && echo "$name-$version" > /usr/scrip_$name || exit $PIPESTATUS
+
+rm -fr $TMP	
+	
+

@@ -3,18 +3,19 @@
 JOBS=$(nproc)
 export MAKEFLAGS="-j${JOBS}"
 export LFS="/mnt/lfs"
-export LFS_TGT=$(uname -m)el-lfs-linux-gnu
-export LFS_BLD=mips64el-redhat-linux-gnu 
-export BUILD64="-mabi=64 -march=mips64r2 -mtune=loongson3a"
 
-PATH=/tools/bin:/bin:/usr/bin
+export CLFS_HOST="`echo ${MACHTYPE} | sed -e 's/unknown/cross/g' -e 's/-pc-/-cross-/g'`"
+export CLFS_TARGET=$(uname -m)el-pc-linux-gnu
+export BUILD64="-mabi=64 -march=mips64r2 -mtune=loongson3a"
+export PATH=/cross-tools/bin:/bin:/usr/bin
 
 export LC_ALL=C PATH
 
 fetch() {
 	
 	tarballname=$(echo $1 | rev | cut -d / -f 1 | rev)
-	WGETCMD="wget --no-check-certificate --passive-ftp --tries=3 --waitretry=3 --output-document=$2/$tarballname.partial"
+	#WGETCMD="wget --no-check-certificate --passive-ftp --tries=3 --waitretry=3 --output-document=$2/$tarballname.partial"
+	WGETCMD="wget --output-document=$2/$tarballname.partial"
 	WGETRESUME="-c"
 	
 	if [ -f $2/$tarballname ]; then
@@ -37,6 +38,21 @@ fetch() {
 	
 }
 
+
+# Creater /cross-tools
+if [ ! -d $LFS/cross-tools ]; then
+	sudo mkdir -pv $LFS/cross-tools
+fi
+
+if [ ! -w $LFS ] || [ ! -w $LFS/cross-tools ]; then
+	sudo chown -Rv $USER:$USER $LFS
+fi
+
+if [ ! -L /cross-tools ] || [ $(realpath /cross-tools) != $LFS/cross-tools ]; then
+	sudo ln -svf $LFS/cross-tools /
+fi
+
+# Creater /tools
 if [ ! -d $LFS/tools ]; then
 	sudo mkdir -pv $LFS/tools
 fi
