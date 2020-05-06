@@ -10,10 +10,10 @@ TMP=${TMP:-/tmp/build}
 LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
  
-name=libcap
-version=2.33
+name=fakeroot
+version=1.22
  
-fetch "https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/$name-$version.tar.xz  " $SRC
+fetch "http://turul.canonical.com/pool/main/f/fakeroot/fakeroot_1.22.orig.tar.bz2 " $SRC
  
 [ "$1" = "fetch" ] && exit 0
  
@@ -26,11 +26,13 @@ tar xf $SRC/$tarballname -C $TMP
    {
  
         cd $TMP/$name-$version
-	
-	make
-	make RAISE_SETFCAP=no lib=lib prefix=/usr install
-	chmod -v 755 /usr/lib/libcap.so
 
+        ./configure --prefix=/usr \
+		    --libdir=/tools/lib/libfakeroot \
+		    --with-ipc=sysv
+
+        make
+        make install
         }   
 } 2>&1 | tee $LOG/$filename.log
     
@@ -38,3 +40,4 @@ tar xf $SRC/$tarballname -C $TMP
 
 rm -fr $TMP	
 	
+

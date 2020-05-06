@@ -10,10 +10,10 @@ TMP=${TMP:-/tmp/build}
 LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
  
-name=libcap
-version=2.33
+name=libarchive
+version=3.3.2
  
-fetch "https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/$name-$version.tar.xz  " $SRC
+fetch "https://www.libarchive.org/downloads/libarchive-3.3.2.tar.gz " $SRC
  
 [ "$1" = "fetch" ] && exit 0
  
@@ -26,11 +26,10 @@ tar xf $SRC/$tarballname -C $TMP
    {
  
         cd $TMP/$name-$version
-	
-	make
-	make RAISE_SETFCAP=no lib=lib prefix=/usr install
-	chmod -v 755 /usr/lib/libcap.so
 
+        ./configure --prefix=/usr
+        make
+        make install
         }   
 } 2>&1 | tee $LOG/$filename.log
     
@@ -38,3 +37,4 @@ tar xf $SRC/$tarballname -C $TMP
 
 rm -fr $TMP	
 	
+

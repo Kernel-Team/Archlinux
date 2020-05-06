@@ -7,11 +7,6 @@ man-pages
 glibc
 adjusting-the-toolchain
 zlib
-libarchive
-pkg-config
-libcap
-fakeroot
-pacman
 bzip2
 xz
 file
@@ -26,7 +21,9 @@ attr
 acl
 shadow
 gcc
+pkg-config
 ncurses
+libcap
 sed
 psmisc
 bison

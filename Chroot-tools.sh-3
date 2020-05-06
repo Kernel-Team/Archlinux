@@ -1,0 +1,5 @@
+chroot --userspec=1000:1000 "/mnt/lfs/" /usr/bin/env -i          \
+    HOME=/home/heyu TERM="$TERM"            \
+    PS1='(lfs chroot) \u:\w\$ '        \
+    PATH=/bin:/usr/bin:/sbin:/usr/sbin \
+    /bin/bash --login
