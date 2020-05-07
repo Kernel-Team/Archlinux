@@ -12,10 +12,10 @@ SRC=${SRC:-$(dirname $0)/src}
 NAME=gcc
 VERSION=${GCC_VER}
 
-fetch "http://www.mpfr.org/mpfr-$MPFR_VER/mpfr-$MPFR_VER.tar.xz" $SRC
-fetch "https://ftp.gnu.org/gnu/mpc/mpc-$MPC_VER.tar.gz" $SRC
-fetch "https://mirrors.tuna.tsinghua.edu.cn/gnu/gmp/gmp-$GMP_VER.tar.xz" $SRC
-fetch "https://mirrors.tuna.tsinghua.edu.cn/gnu/gcc/gcc-$GCC_VER/gcc-$GCC_VER.tar.xz" $SRC
+fetch "http://ftp.lfs-matrix.net/pub/lfs/lfs-packages/7.7-systemd/mpfr-3.1.2.tar.xz " $SRC
+fetch "http://ftp.lfs-matrix.net/pub/lfs/lfs-packages/7.7-systemd/mpc-1.0.2.tar.gz " $SRC
+fetch "http://ftp.lfs-matrix.net/pub/lfs/lfs-packages/7.7-systemd/gmp-6.0.0a.tar.xz" $SRC
+fetch "http://ftp.lfs-matrix.net/pub/lfs/lfs-packages/7.7-systemd/gcc-4.9.2.tar.bz2" $SRC
 
 [ "$1" = "fetch" ] && exit 0
 
@@ -24,7 +24,7 @@ mkdir -p $TMP $LOG $SRC
 
 tar xf $SRC/$tarballname -C $TMP
 tar -xf $SRC/mpfr-$MPFR_VER.tar.xz -C $TMP/$NAME-$VERSION
-tar -xf $SRC/gmp-$GMP_VER.tar.xz -C $TMP/$NAME-$VERSION
+tar -xf $SRC/gmp-${GMP_VER}a.tar.xz -C $TMP/$NAME-$VERSION
 tar -xf $SRC/mpc-$MPC_VER.tar.gz -C $TMP/$NAME-$VERSION
 
 { time \
