@@ -1,0 +1,27 @@
+From 5f09e0769b7a3c3f6f801c16aa643287f0732423 Mon Sep 17 00:00:00 2001
+From: "shipujin.t@gmail.com" <Shi Pujin>
+Date: Fri, 8 May 2020 16:03:56 +0800
+Subject: [PATCH] nettle-3.6 add configure mips64el judge option
+
+---
+ configure | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/configure b/configure
+index 0f9bd85..1e6eed2 100755
+--- a/configure
++++ b/configure
+@@ -6389,6 +6389,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ #error 64-bit mips
+ #endif
+ 
++#if defined(__mips64) 
++#error 64-bit mips
++#endif
++
+ int
+ main ()
+ {
+-- 
+2.17.2
+
