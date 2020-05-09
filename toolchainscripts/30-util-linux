@@ -26,12 +26,14 @@ tar xf $SRC/$tarballname -C $TMP
 
 	cd $TMP/$NAME-$VERSION
 
+	./autogen.sh
+	#./configure --prefix=/tools            \
 	./configure --prefix=/tools --build=$LFS_TGT           \
-				--without-python               \
-				--disable-makeinstall-chown    \
-				--without-systemdsystemunitdir \
-				--without-ncurses              \
-				PKG_CONFIG=""
+		    --without-python               \
+		    --disable-makeinstall-chown    \
+		    --without-systemdsystemunitdir \
+		    --without-ncurses              \
+		    PKG_CONFIG=""
 	make
 	make install
 	

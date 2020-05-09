@@ -1,0 +1,39 @@
+From 8c87d3495031127aefb8552c93b2d7d55d26e82f Mon Sep 17 00:00:00 2001
+From: Chenghua Xu <xuchenghua@loongson.cn>
+Date: Thu, 7 Dec 2017 10:13:16 +0800
+Subject: [PATCH 6/7] Set gas default abi to n64
+
+---
+ gas/configure                   | 2 +-
+ ld/testsuite/config/default.exp | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gas/configure b/gas/configure
+index 0d5422572f..f1c69b7278 100755
+--- a/gas/configure
++++ b/gas/configure
+@@ -12382,7 +12382,7 @@ _ACEOF
+ 	case ${target} in
+ 	  mips64*-linux* | mips-sgi-irix6* | mips64*-freebsd* \
+ 	  | mips64*-kfreebsd*-gnu | mips64*-ps2-elf*)
+-	    mips_default_abi=N32_ABI
++	    mips_default_abi=N64_ABI
+ 	    ;;
+ 	  mips*-linux* | mips*-freebsd* | mips*-kfreebsd*-gnu)
+ 	    mips_default_abi=O32_ABI
+diff --git a/ld/testsuite/config/default.exp b/ld/testsuite/config/default.exp
+index 29c020ffa4..3d75fc36e3 100644
+--- a/ld/testsuite/config/default.exp
++++ b/ld/testsuite/config/default.exp
+@@ -103,7 +103,7 @@ if {[istarget mips64*-*-linux*] &&
+     (![board_info [target_info name] exists multilib_flags] ||
+      ![string match "*-mabi" [board_info [target_info name] multilib_flags]])
+    } {
+-    append gcc_B_opt " -mabi=n32"
++    append gcc_B_opt " -mabi=64"
+ }
+ 
+ if { [istarget rx-*-*] } {
+-- 
+2.17.0
+
