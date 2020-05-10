@@ -11,7 +11,7 @@ LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
  
 name=gcc
-version=8.2.0
+version=8.1.0
  
 fetch "https://github.com/shadow-maint/shadow/releases/download/$version/$name-$version.tar.xz  " $SRC
  
@@ -33,7 +33,8 @@ tar xf $SRC/$tarballname -C $TMP
 
 	# Do not run fixincludes
 	sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
-
+	
+	./contrib/download_prerequisites
 	mkdir -v build
 	cd       build
 
@@ -45,7 +46,7 @@ tar xf $SRC/$tarballname -C $TMP
 		--disable-bootstrap \
 		--with-system-zlib 
 
-	make
+	make 
 
 	make install
         }   

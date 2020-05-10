@@ -11,7 +11,7 @@ LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
  
 name=bzip2
-version=1.0.8
+version=1.0.6
  
 fetch "https://www.sourceware.org/pub/bzip2/$name-$version.tar.gz  " $SRC
  

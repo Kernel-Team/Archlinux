@@ -11,7 +11,7 @@ LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
  
 name=xz
-version=5.2.5
+version=5.2.4
  
 fetch " https://tukaani.org/$name/$name-$version.tar.xz " $SRC
  

@@ -11,7 +11,8 @@ SRC=${SRC:-$(dirname $0)/src}
 name=man-pages
 version=5.06
 
-fetch "https://www.kernel.org/pub/linux/docs/$name/$name-$version.tar.xz" $SRC
+#fetch "https://www.kernel.org/pub/linux/docs/$name/$name-$version.tar.xz" $SRC
+fetch "https://mirrors.edge.kernel.org/pub/linux/docs/$name/$name-$version.tar.xz" $SRC
 
 [ "$1" = "fetch" ] && exit 0
 

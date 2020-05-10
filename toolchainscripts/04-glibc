@@ -33,12 +33,8 @@ tar xf $SRC/$tarballname -C $TMP
 		  --prefix=/tools                    \
 		  --host=$LFS_TGT                    \
 		  --build=$LFS_BLD		     \
-		  --disable-multilib		     \
-		  --disable-nls   		     \
 		  --enable-kernel=3.2                \
 	          --with-headers=/tools/include      \
-		  libc_cv_forced_unwind=yes	     \
-		  libc_cv_c_cleanup=yes		     \
 		  --with-abi=64 		     \
 		  --with-endlan=little
 
