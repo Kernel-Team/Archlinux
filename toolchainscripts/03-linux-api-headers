@@ -12,7 +12,7 @@ SRC=${SRC:-$(dirname $0)/src}
 NAME=linux
 VERSION=${LINUX_VER}
 
-fetch "https://mirrors.tuna.tsinghua.edu.cn/kernel/v4.x/linux-$LINUX_VER.tar.xz" $SRC
+fetch "https://mirrors.tuna.tsinghua.edu.cn/kernel/v5.x/linux-$LINUX_VER.tar.xz" $SRC
 
 [ "$1" = "fetch" ] && exit 0
 

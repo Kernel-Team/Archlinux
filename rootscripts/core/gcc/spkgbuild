@@ -44,7 +44,10 @@ tar xf $SRC/$tarballname -C $TMP
 		--enable-languages=c,c++ \
 		--disable-multilib \
 		--disable-bootstrap \
-		--with-system-zlib 
+		--with-system-zlib  \
+                --with-abi=64       \
+		--with-arch=mips64r2 \
+                --with-tune=loongson3a
 
 	make 
 
