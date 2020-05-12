@@ -8,9 +8,8 @@ export LC_ALL=C PATH
 fetch() {
 	
 	tarballname=$(echo $1 | rev | cut -d / -f 1 | rev)
-	#WGETCMD="wget --random-file --no-check-certificate --passive-ftp --tries=3 --waitretry=3 --output-document=$2/$tarballname.partial"
-	WGETCMD="wget --random-file --passive-ftp --tries=3 --waitretry=3 --output-document=$2/$tarballname.partial"
-	WGETRESUME="-c"
+	WGETCMD="wget --no-check-certificate --random-file --no-check-certificate --passive-ftp --tries=3 --waitretry=3 --output-document=$2/$tarballname.partial"
+	WGETRESUME="-c --no-check-certificate "
 	
 	if [ -f $2/$tarballname ]; then
 		echo "Source file $tarballname found."

@@ -11,7 +11,7 @@ LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
  
 name=Python
-version=3.8.2
+version=3.7.2
  
 fetch "https://www.python.org/ftp/python/$version/Python-$version.tar.xz  " $SRC
  
@@ -35,10 +35,6 @@ tar xf $SRC/$tarballname -C $TMP
 
         make
 	make install
-
-	chmod -v 755 /usr/lib/libpython3.8.so
-	chmod -v 755 /usr/lib/libpython3.so
-	ln -sfv pip3.8 /usr/bin/pip3
         }   
 } 2>&1 | tee $LOG/$filename.log
     

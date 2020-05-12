@@ -13,7 +13,7 @@ SRC=${SRC:-$(dirname $0)/src}
 name=util-linux
 version=2.35.1
  
-fetch "https://www.kernel.org/pub/linux/utils/$name/v$_ver/$name-$version.tar.xz  " $SRC
+fetch "https://www.kernel.org/pub/linux/utils/$name/v2.35/$name-$version.tar.xz  " $SRC
  
 [ "$1" = "fetch" ] && exit 0
  

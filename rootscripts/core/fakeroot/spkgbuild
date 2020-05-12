@@ -10,10 +10,10 @@ TMP=${TMP:-/tmp/build}
 LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
  
-name=openssl
-version=1.0.2q
+name=fakeroot
+version=1.22
  
-fetch "https://openssl.org/source/$name-$version.tar.gz  " $SRC
+fetch "http://turul.canonical.com/pool/main/f/fakeroot/fakeroot_1.22.orig.tar.bz2 " $SRC
  
 [ "$1" = "fetch" ] && exit 0
  
@@ -27,19 +27,12 @@ tar xf $SRC/$tarballname -C $TMP
  
         cd $TMP/$name-$version
 
-	./config --prefix=/usr                          \
-	         --openssldir=/etc/ssl \
-	         --libdir=lib          \
-	         shared                \
-	         zlib-dynamic
-	./Configure linux64-mips64	
+        ./configure --prefix=/usr \
+		    --libdir=/tools/lib/libfakeroot \
+		    --with-ipc=sysv
 
-	make
-
-	# disable static lib
-	sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
-
-	make MANSUFFIX=ssl install
+        make
+        make install
         }   
 } 2>&1 | tee $LOG/$filename.log
     
