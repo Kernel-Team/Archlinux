@@ -11,7 +11,7 @@ LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
  
 name=openssl
-version=1.0.2q
+version=1.1.1d
  
 fetch "https://openssl.org/source/$name-$version.tar.gz  " $SRC
  

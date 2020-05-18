@@ -29,10 +29,10 @@ tar xf $SRC/$tarballname -C $TMP
 
 	./configure --prefix=/usr                          \
 		    --disable-static 			   \
-                    --with-abi=64       \
-                    --with-arch=mips64r2 \
-                    --with-tune=loongson3a \
-		    --with-gcc-arch=native
+
+
+
+#		    --with-gcc-arch=native
 
         make
 	make install

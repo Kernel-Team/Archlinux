@@ -27,6 +27,7 @@ tar xf $SRC/$tarballname -C $TMP
  
         cd $TMP/$name-$version
 
+	#./bootstrap
 	./configure --prefix=/usr                          \
 
         make

@@ -30,7 +30,7 @@ tar xf $SRC/$tarballname -C $TMP
 	./configure --prefix=/usr       \
 	            --enable-shared     \
 	            --with-system-expat \
-	            --with-system-ffi   \
+	            --without-system-ffi   \
                     --with-ensurepip=yes 
 
         make

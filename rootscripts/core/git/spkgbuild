@@ -10,11 +10,10 @@ TMP=${TMP:-/tmp/build}
 LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
  
-name=automake
-version=1.16.2
-#version=1.14
+name=git
+version=2.26.2
  
-fetch "https://ftp.gnu.org/gnu/$name/$name-$version.tar.xz  " $SRC
+fetch "https://mirrors.edge.kernel.org/pub/software/scm/${name}/${name}-${version}.tar.gz " $SRC
  
 [ "$1" = "fetch" ] && exit 0
  
@@ -28,10 +27,9 @@ tar xf $SRC/$tarballname -C $TMP
  
         cd $TMP/$name-$version
 
-	./configure --prefix=/usr                          \
-
+        ./configure --prefix=/usr
         make
-	make install
+        make install
         }   
 } 2>&1 | tee $LOG/$filename.log
     

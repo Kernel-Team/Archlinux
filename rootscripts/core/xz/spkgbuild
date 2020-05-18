@@ -28,8 +28,10 @@ tar xf $SRC/$tarballname -C $TMP
         cd $TMP/$name-$version
 	
 	./configure --prefix=/usr \
-	            --disable-static \
+		    --enable-shared \
 		    --disable-nls
+#	            --disable-static \
+#		    --disable-nls
 	make
 	make install
 	#mv -v   /usr/bin/{lzma,unlzma,lzcat,xz,unxz,xzcat} /bin

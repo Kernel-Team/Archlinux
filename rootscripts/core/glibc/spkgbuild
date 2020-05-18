@@ -11,7 +11,7 @@ LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
  
 name=glibc
-version=2.27
+version=2.31
  
 fetch "https://mirrors.tuna.tsinghua.edu.cn/gnu/glibc/glibc-$version.tar.xz" $SRC
  

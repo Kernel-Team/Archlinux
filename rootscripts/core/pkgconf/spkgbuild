@@ -10,11 +10,10 @@ TMP=${TMP:-/tmp/build}
 LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
  
-name=automake
-version=1.16.2
-#version=1.14
+name=pkgconfig
+version=1.6.3
  
-fetch "https://ftp.gnu.org/gnu/$name/$name-$version.tar.xz  " $SRC
+fetch "https://github.com/pkgconf/pkgconf/archive/$name-$version.tar.gz  " $SRC
  
 [ "$1" = "fetch" ] && exit 0
  
@@ -28,7 +27,13 @@ tar xf $SRC/$tarballname -C $TMP
  
         cd $TMP/$name-$version
 
-	./configure --prefix=/usr                          \
+	./configure \
+	    --prefix=/usr \
+	    --sysconfdir=/etc \
+	    --with-pkg-config-dir=/usr/lib/pkgconfig:/usr/share/pkgconfig \
+	    --with-system-libdir=/usr/lib \
+	    --with-system-includedir=/usr/include \
+	    --disable-static
 
         make
 	make install

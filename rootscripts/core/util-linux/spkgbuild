@@ -11,7 +11,8 @@ LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
  
 name=util-linux
-version=2.35.1
+#version=2.35.1
+version=2.35
  
 fetch "https://www.kernel.org/pub/linux/utils/$name/v2.35/$name-$version.tar.xz  " $SRC
  
@@ -28,7 +29,7 @@ tar xf $SRC/$tarballname -C $TMP
         cd $TMP/$name-$version
 
 	./configure ADJTIME_PATH=/var/lib/hwclock/adjtime   \
-            --docdir=/usr/share/doc/util-linux-2.35.1 \
+            --docdir=/usr/share/doc/util-linux-2.35 \
             --disable-chfn-chsh  \
             --disable-login      \
             --disable-nologin    \
@@ -38,6 +39,8 @@ tar xf $SRC/$tarballname -C $TMP
             --disable-pylibmount \
             --disable-static     \
             --without-python
+
+            #--docdir=/usr/share/doc/util-linux-2.35.1 \
 
         make
 	make install
