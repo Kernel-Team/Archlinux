@@ -13,7 +13,7 @@ SRC=${SRC:-$(dirname $0)/src}
 name=fakeroot
 version=1.24
  
-fetch "http://turul.canonical.com/pool/main/f/fakeroot/fakeroot_${version}.orig.tar.bz2 " $SRC
+fetch "http://turul.canonical.com/pool/main/f/fakeroot/fakeroot_${version}.orig.tar.gz " $SRC
  
 [ "$1" = "fetch" ] && exit 0
  
