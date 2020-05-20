@@ -9,6 +9,8 @@ filename=$(echo $0 | rev | cut -d / -f1 | rev)
 TMP=${TMP:-/tmp/build}
 LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
+
+PATCH_DIR=${PATCH_DIR:-$(dirname $0)/patch/}
  
 name=fakeroot
 version=1.24
@@ -25,7 +27,10 @@ tar xf $SRC/$tarballname -C $TMP
 { time \
    {
  
+	cp ${PATCH_DIR}0001-Description-support-for-illumos-solaris-ACLs.patch $TMP
         cd $TMP/$name-$version
+
+	patch -Np1 -i ../0001-Description-support-for-illumos-solaris-ACLs.patch
 
         ./configure --prefix=/usr \
 		    --libdir=/usr/lib/libfakeroot \
