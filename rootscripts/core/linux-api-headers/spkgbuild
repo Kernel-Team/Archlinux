@@ -10,7 +10,8 @@ LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
 
 name=linux
-version=4.19.19
+#version=4.19.19
+version=5.4.6
 
 fetch "https://mirrors.tuna.tsinghua.edu.cn/kernel/v4.x/linux-$version.tar.xz" $SRC
 
@@ -26,8 +27,8 @@ tar xf $SRC/$tarballname -C $TMP
 
 	cd $TMP/$name-$version
 
-	make mrproper
-        make INSTALL_HDR_PATH=dest headers_install
+	make INSTALL_HDR_PATH=dest headers_install
+	find dest/include \( -name .install -o -name ..install.cmd \) -delete
 	cp -rv dest/include/* /usr/include
 	
 	}

@@ -10,10 +10,10 @@ TMP=${TMP:-/tmp/build}
 LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
  
-name=fakeroot
-version=1.24
+name=curl
+version=7.63.0
  
-fetch "http://turul.canonical.com/pool/main/f/fakeroot/fakeroot_${version}.orig.tar.bz2 " $SRC
+fetch "https://curl.haxx.se/download/$name-$version.tar.xz" $SRC
  
 [ "$1" = "fetch" ] && exit 0
  
@@ -27,10 +27,10 @@ tar xf $SRC/$tarballname -C $TMP
  
         cd $TMP/$name-$version
 
-        ./configure --prefix=/usr \
-		    --libdir=/usr/lib/libfakeroot \
-		    --with-ipc=sysv
-
+        ./configure --prefix=/usr 		  \
+			--with-ssl                 \
+			--enable-threaded-resolver \
+			--with-ca-bundle=/tools/etc/ssl/certs/ca-certificates.crt
         make
         make install
         }   

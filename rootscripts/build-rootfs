@@ -7,7 +7,6 @@ man-pages
 glibc
 adjusting-the-toolchain
 zlib
-xz
 bzip2
 pkg-config
 libcap
@@ -40,6 +39,7 @@ perl
 perl-xml-parser
 autoconf
 automake
+xz
 kmod
 gettext
 elfutils
@@ -70,7 +70,7 @@ dbus
 procps-ng
 util-linux
 e2fsprogs
-#git
+git
 )
 SCRIPTDIR=$(dirname $0)/rootscripts/core/
 

@@ -5,6 +5,9 @@ PKG=(
 libarchive
 fakeroot
 pacman
+wget
+curl
+httpup
 )
 SCRIPTDIR=$(dirname $0)/rootscripts/core/
 

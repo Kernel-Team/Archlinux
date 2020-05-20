@@ -32,7 +32,7 @@ tar xf $SRC/$tarballname -C $TMP
 	         --libdir=lib          \
 	         shared                \
 	         zlib-dynamic
-	./Configure linux64-mips64	
+	./Configure linux64-mips64 --prefix=/usr --openssldir=/etc/ssl --libdir=lib shared zlib-dynamic	
 
 	make
 
