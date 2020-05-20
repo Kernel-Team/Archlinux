@@ -10,10 +10,9 @@ LOG=${LOG:-$(dirname $0)/log}
 SRC=${SRC:-$(dirname $0)/src}
 
 name=linux
-#version=4.19.19
 version=5.4.6
 
-fetch "https://mirrors.tuna.tsinghua.edu.cn/kernel/v4.x/linux-$version.tar.xz" $SRC
+fetch "https://mirrors.tuna.tsinghua.edu.cn/kernel/v5.x/linux-$version.tar.xz" $SRC
 
 [ "$1" = "fetch" ] && exit 0
 
