@@ -27,13 +27,21 @@ tar xf $SRC/$tarballname -C $TMP
  
         cd $TMP/$name-$version
 
-        ./configure --prefix=/usr \
-        	    --disable-doc     \
-	            --disable-shared  \
-        	    --sysconfdir=/etc \
-	            --localstatedir=/var
-        make
+#        ./configure --prefix=/usr \
+#        	    --disable-doc     \
+#	            --disable-shared  \
+#        	    --sysconfdir=/etc \
+#	            --localstatedir=/var
+
+	  ./configure --prefix=/usr --sysconfdir=/etc \
+	    --localstatedir=/var --enable-doc \
+	    --with-scriptlet-shell=/usr/bin/bash \
+	    --with-ldconfig=/usr/bin/ldconfig
+	  make
+	  make -C contrib
+
         make install
+
         }   
 } 2>&1 | tee $LOG/$filename.log
     

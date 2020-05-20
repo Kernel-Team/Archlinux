@@ -27,7 +27,7 @@ tar xf $SRC/$tarballname -C $TMP
  
         cd $TMP/$name-$version
 
-        ./configure --prefix=/usr
+        ./configure --prefix=/usr --without-nettle --without-xml2
         make
         make install
         }   

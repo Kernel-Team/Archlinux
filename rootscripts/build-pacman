@@ -35,3 +35,10 @@ echo
 echo "**************************************************"
 echo "*********    Toolchain build complete    *********"
 echo "**************************************************"
+
+if [ ! -d /home/ben ] ; then
+	mkdir -v /home/ben
+	echo "ben:x:1000:999:Ben:/home/ben:/bin/bash" >> /etc/passwd
+fi
+chown -Rv ben:users /home/ben
+
