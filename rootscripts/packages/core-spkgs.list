@@ -1,5 +1,4 @@
 acl
-linux-firmware
 archlinux-keyring
 argon2
 attr
@@ -15,7 +14,6 @@ bridge-utils
 btrfs-progs
 bzip2
 ca-certificates
-nss
 ca-certificates-utils
 coreutils
 cracklib
@@ -26,7 +24,6 @@ curl
 dash
 db
 dbus
-lvm2
 dhcpcd
 dialog
 diffutils
@@ -68,7 +65,6 @@ ifenslave
 inetutils
 iproute2
 iptables
-iptables
 iputils
 ipw2100-fw
 iw
@@ -93,7 +89,6 @@ libgpg-error
 libgssglue
 libidn2
 libksba
-openldap
 libmicrohttpd
 libmnl
 libmpc
@@ -102,7 +97,6 @@ libnfnetlink
 libnftnl
 libnghttp2
 libnl
-p11-kit
 libpcap
 libpipeline
 libpsl
@@ -132,7 +126,6 @@ make
 man-db
 man-pages
 mdadm
-zlib
 mkinitcpio
 mkinitcpio-busybox
 mkinitcpio-nfs-utils
@@ -172,8 +165,6 @@ procinfo-ng
 procps-ng
 psmisc
 pth
-audit
-gpgme
 qgpgme
 readline
 reiserfsprogs
@@ -183,7 +174,6 @@ sdparm
 sed
 shadow
 s-nail
-sqlite
 sqlite
 sudo
 sysfsutils
