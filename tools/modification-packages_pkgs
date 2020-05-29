@@ -1,0 +1,23 @@
+#!/bin/bash
+#set -e
+set -x
+
+
+
+#for line in `cat ../Archlinux-name-pkg.txt`
+#do
+#    echo $line
+#    cp -rfa $line ../packages/
+#done
+#makepkg --verifysource --skipchecksums --skippgpcheck  
+
+for line in `cat ../Archlinux-name-pkg.txt-all`
+do
+    echo $line
+    pushd $line/trunk/
+    #makepkg --verifysource --skipchecksums --skippgpcheck 
+    #sed -i "s/^.*arch.*$/arch=('x86_64' 'mips64el')/"  PKGBUILD
+    sed -i "s/^arch=.*$/arch=('x86_64' 'mips64el')/"  PKGBUILD
+    popd
+done
+
